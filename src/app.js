@@ -2,30 +2,20 @@ const express = require("express");
 
 const app = express();
 
-const { adminAuth, userAuth } = require("./middlewares/auth.js");
-
-app.use("/admin", adminAuth); // This middleware will be executed for all routes starting with /admin
-
-//second way of adding middleware
-app.get("/user", userAuth, (req, res) => {
-  res.send("user Data Sent");
+app.get("/getUserData", (req, res) => {
+  //try {
+  throw new Error("dvdhdjsjasj");
+  res.send("User Data sent");
+  // } catch (err) {
+  //   res.status(500).send("Internal Server Error: ");
+  // }
 });
-app.get("/admin/getAllData", (req, res) => {
-  res.send("All data Sent");
-});
-app.get("/admin/deleteUser", (req, res) => {
-  // Handle Auth middleware for all the GET, POST, PUT, DELETE requests
-  app.use("/admin", (req, res, next) => {
-    console.log("Admin Auth is getting checked");
-    const token = "xyz";
-    const isAdminAuthorized = token === "xyz";
-    if (isAdminAuthorized) {
-      next();
-    } else {
-      res.status(401).send("Unauthorized access");
-    }
-  });
-  res.send("Deleted the user");
+
+// error handling middleware
+// This middleware will catch any errors that are thrown in the routes or other middleware
+app.use("/", (err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong: " + err.message);
 });
 
 app.listen(3000, () => {
