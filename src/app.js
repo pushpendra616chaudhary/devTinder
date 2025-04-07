@@ -75,6 +75,57 @@ app.get("/user1", async (req, res) => {
   }
 });
 
+// delete the user from the database
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+
+  try {
+    //const user = await User.findByIdAndDelete(_id:userId);
+    const user = await User.findByIdAndDelete(userId);
+
+    res.send("User deleted successfully");
+  } catch (err) {
+    res
+      .status(400)
+      .send("Something went wrong while deleting the user: " + err.message);
+  }
+});
+
+// update the user in the database by id
+
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+
+  try {
+    await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+    });
+
+    res.send("User updated successfully");
+  } catch (err) {
+    res
+      .status(400)
+      .send("Something went wrong while updating the user: " + err.message);
+  }
+});
+
+// update the user in the database by email
+
+app.patch("/user", async (req, res) => {
+  const userEmail = req.body.userEmailmail; // client se email le rahe hain
+  const data = req.body; // updated data bhi client se aa raha hai
+
+  try {
+    await User.findOneAndUpdate({ emailId: userEmail }, data);
+
+    res.send("User updated successfully via email");
+  } catch (err) {
+    res
+      .status(400)
+      .send("Something went wrong while updating user: " + err.message);
+  }
+});
 connectDB()
   .then(() => {
     console.log("Database connectiom established...");
