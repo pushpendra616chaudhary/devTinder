@@ -35,8 +35,10 @@ app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
 
   try {
+    // this users represents the array of users
     const users = await User.find({ emailId: userEmail });
 
+    // if there are no users with the given emailId, then send 404 status code
     if (users.length === 0) {
       res.status(404).send("User not found");
     } else {
@@ -65,6 +67,8 @@ app.get("/user1", async (req, res) => {
 
   try {
     const users = await User.findOne({ emailId: userEmail });
+
+    // if there are no users with the given emailId, then send 404 status code
     if (!users) {
       res.status(404).send("User not found");
     } else {
@@ -93,13 +97,27 @@ app.delete("/user", async (req, res) => {
 
 // update the user in the database by id
 
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
 
   try {
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+
+    const isUpdateAllowed = Object.keys(data).every((key) =>
+      ALLOWED_UPDATES.includes(key)
+    ); // check if the keys in the data object are allowed to be updated
+    if (!isUpdateAllowed) {
+      // if not, then send 400 status code
+      throw new Error("Update Not Allowed");
+    }
+
+    if (data?.skills.length > 10) {
+      throw new Error("Skills cannot be more than 10");
+    }
     await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
+      runValidators: true, // this is true for update validation
     });
 
     res.send("User updated successfully");
